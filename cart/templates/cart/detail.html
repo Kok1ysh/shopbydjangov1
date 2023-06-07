@@ -1,0 +1,58 @@
+{% extends "shop/base.html" %}
+{% load static %}
+{% block title %}Your shopping cart{% endblock %}
+{% block content %}
+<h2>Корзина з товарами</h2>
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>Зображення</th>
+        <th>Назва товару</th>
+        <th>Кількість</th>
+        <th>Видалити</th>
+        <th>Вартість за од.тов.</th>
+        <th>Сума, грн</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in cart %}
+    <tr>
+        <td>
+
+            <a href="{% url 'shop:product_detail' id=item.product.id %}">
+                <img src="{% if item.product.image %}{{ item.product.image.url }}
+{% else %}{% static 'img/no_image.png' %}{% endif %}">
+            </a>
+        </td>
+        <td>{{ item.product.name }}</td>
+        <td>
+            <form action="{% url 'cart:cart_add' item.product.id %}" method="post">
+                {% csrf_token %}
+                {{cart_product_form}}
+                <!-- виведення окремо кожного поля форми із переданими значеннями за замовчуванням-->
+                {{item.update_count_form.count_product}}
+                <!-- Наступне поле є прихованим (див. forms.py)-->
+                {{item.update_count_form.update_count_product}}
+                <input type="submit" value="Змінити">
+            </form>
+        </td>
+<!--                <td>{{ item.count_product }}</td>-->
+        <td><a href="{% url 'cart:cart_remove' item.product.id%}">Видалити</a></td>
+        <td>{{ item.price }} грн.</td>
+        <td>{{ item.result_price }} грн.</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td><b> Сума до оплати:</b></td>
+        <td colspan="4"></td>
+        <td><b>{{ cart.get_total_price }} грн.</b></td>
+    </tr>
+    </tbody>
+</table>
+<p>
+<p class="text-right">
+    <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Продовжити
+        покупки</a>
+    <a href="{% url 'orders:order_create' %}" class="btn btn-primary">Оформити замовення</a>
+</p>
+{% endblock %}
